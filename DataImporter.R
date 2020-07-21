@@ -1,8 +1,9 @@
 library(stringr)
+library(dplyr)
 lab.dir<-"C:/MaestriaUFG/BigData/Laboratorio/Laboratorio1"
 lab.datadir<-str_c(lab.dir,"/datos_pacientes")
 
-patients.dates<-c("Dia_0", "Dia_30", "Dia_60", "Dia_90", "Dia_120", "Dia_180" , "Dia_240", "Dia_300", "Dia_360")
+patients.dates<-c(0, 30,60,90,120,180,240,300, 360)
 
 patients.db<-data.frame()
 
@@ -21,17 +22,30 @@ for(i in 1:100){
  
 }
 
+punto3set <-patients.db[,c("p_edate","p_health")]
 
-table_prog_efect<-table(patients.db$p_edate,patients.db$p_pdate)
-table_prog_efect
-summary()
+agrupadosporconsultaefectiva<- punto3set %>%
+   group_by(p_edate) %>%
+    summarise(Media=mean(p_health),Mediana=median(p_health), Minimo=min(p_health),Maximo=max(p_health))
 
+plot(agrupadosporconsultaefectiva$p_edate,
+     y=agrupadosporconsultaefectiva$Media,
+     ylab = "Media Porcentaje de Salud",xlab = "Fecha de Consulta Efeciva",
+     type="b",
+     main="Gráfica de agrupación por fecha efectiva\n de consulta contra la Media del Porcentaje de Salud"
+     )
 
-prop.table(table_prog_efect,1)
-prop.table(table_prog_efect,2)
-margin.table(table_prog_efect,1)
-margin.table(table_prog_efect,2)
+punto31set <-patients.db[,c("p_pdate","p_health")]
 
-str(patients.db)
+agrupadosporconsultaprogramada<- punto31set %>%
+   group_by(p_pdate) %>%
+   summarise(Media=mean(p_health),Mediana=median(p_health), Minimo=min(p_health),Maximo=max(p_health))
+
+plot(agrupadosporconsultaprogramada$p_pdate,
+     y=agrupadosporconsultaprogramada$Mediana,
+     ylab = "Mediana Porcentaje de Salud",xlab = "Fecha de Consulta Programada",
+     type="b",
+     main="Gráfica de agrupación por fecha Programada\n de consulta contra la Mediana del Porcentaje de Salud"
+)
 
 
